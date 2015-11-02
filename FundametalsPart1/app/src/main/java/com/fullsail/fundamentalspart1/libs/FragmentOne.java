@@ -43,6 +43,7 @@ import java.util.ArrayList;
  */
 public class FragmentOne extends Fragment implements AdapterView.OnItemClickListener {
 
+   // Global Variables
    FragmentOneListener listener;
 
    String zipLocation = "";
@@ -64,6 +65,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
    private File filesDir;
 
 
+   // Attach activity to click listener
    @Override
    public void onAttach(Activity activity) {
       super.onAttach(activity);
@@ -76,11 +78,13 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
       }
    }
 
+
    @Override
    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
       super.onCreateView(inflater, container, savedInstanceState);
 
+      // Set frag one layout
       rootView = inflater.inflate(R.layout.frag_one, container, false);
 
       Context cont = getActivity().getApplicationContext();
@@ -94,12 +98,15 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
 
       super.onActivityCreated(savedInstanceState);
 
+      // LIst view set up
       lv = (ListView) rootView.findViewById(R.id.listView);
-      //lv.setOnItemClickListener((AdapterView.OnItemClickListener) this);
+
       lv.setOnItemClickListener(this);
 
+      // Check if network is available
       Boolean network = ((MainActivity) getActivity()).isNetworkAvailable();
 
+      // If not network pull saved data
       if (!network) {
 
          ((MainActivity) getActivity()).networkAlert();
@@ -155,6 +162,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
 
 
 
+      //When button click start async task api search
       getActivity().findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 
          @Override
@@ -170,6 +178,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
             Boolean network = ((MainActivity) getActivity()).isNetworkAvailable();
 
 
+            // If no network pull saved data
             if (!network) {
 
                ((MainActivity) getActivity()).networkAlert();
@@ -219,6 +228,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
 
             } else {
 
+               //Set zip code and create url for AsyncTAsk
                if (digitsOnly) {
                   String zipCode = zip;
                   if (zipCode.length() == 5) {
@@ -243,11 +253,13 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
       });
    }
 
+   // Item click from the list view
    @Override
    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
       Boolean network = ((MainActivity) getActivity()).isNetworkAvailable();
 
+      //If no network pul saved data
       if (!network) {
 
          try
@@ -293,6 +305,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
 
       } else {
 
+         // set text for listener to send to detail view frag two
          condition = "\n" + "Condition: " + arr2.get(position);
          high = "\n" + "High: " + arr3.get(position);
          low = "\n" + "Low: " + arr4.get(position);
@@ -307,6 +320,7 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
       return filesDir;
    }
 
+   //Run Async Task
    private class MyAsyncTask extends AsyncTask<String, Void, Void> {
 
       @Override
@@ -379,7 +393,8 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
       }
 
 
-      //@Override
+      //After async task is done populate list view
+      @Override
       protected void onPostExecute(Void results) {
          super.onPostExecute(results);
          System.out.println(results);

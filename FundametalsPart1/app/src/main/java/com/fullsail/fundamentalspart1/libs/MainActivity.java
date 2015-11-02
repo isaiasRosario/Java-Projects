@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -24,14 +24,12 @@ public class MainActivity extends ActionBarActivity implements FragmentOneListen
       // Get any saved data
       super.onCreate(savedInstanceState);
 
+      // Check Network Boolean
       Boolean network = isNetworkAvailable();
 
       System.out.println(network);
 
-//      if(network == false) networkAlert();
-
-
-
+      //Setting fragments transactions
       setContentView(R.layout.activity_main);
       fragManager = getFragmentManager();
       fragManager.beginTransaction().replace(R.id.containerOne, new FragmentOne()).commit();
@@ -40,6 +38,7 @@ public class MainActivity extends ActionBarActivity implements FragmentOneListen
 
    }
 
+   //Check network method
    public boolean isNetworkAvailable() {
       ConnectivityManager connectivityManager
          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -47,6 +46,7 @@ public class MainActivity extends ActionBarActivity implements FragmentOneListen
       return activeNetworkInfo != null && activeNetworkInfo.isConnected();
    }
 
+   //Fragment click listener
    @Override
    public void clickListener(String data, String data1, String data2, String data3){
 
@@ -58,6 +58,55 @@ public class MainActivity extends ActionBarActivity implements FragmentOneListen
 
    }
 
+   // I should only use one alert and pass values ********
+   //
+   // No Zip Code Alert
+   public void alert(){
+
+      AlertDialog.Builder alert = new AlertDialog.Builder(this);
+      alert.setTitle("NOPE NO ZIP CODE!");
+      alert.setMessage("Enter zip Code");
+      alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+         public void onClick(DialogInterface dialog, int whichButton) {
+
+         }
+      });
+
+      alert.show();
+
+   }
+
+   //No network alert
+   public void networkAlert(){
+
+      AlertDialog.Builder alert = new AlertDialog.Builder(this);
+      alert.setTitle("No Internet!");
+      alert.setMessage("No internet....");
+      alert.setNegativeButton("Close", new DialogInterface.OnClickListener(){
+         public void onClick(DialogInterface dialog, int whichButton){
+
+         }
+      });
+
+      alert.show();
+
+   }
+
+   //No saved data alert
+   public void nodataAlert(){
+
+      AlertDialog.Builder alert = new AlertDialog.Builder(this);
+      alert.setTitle("No Saved Data!");
+      alert.setMessage("No Saved Data....");
+      alert.setNegativeButton("Close", new DialogInterface.OnClickListener(){
+         public void onClick(DialogInterface dialog, int whichButton){
+
+         }
+      });
+
+      alert.show();
+
+   }
 
 
    @Override
@@ -82,48 +131,4 @@ public class MainActivity extends ActionBarActivity implements FragmentOneListen
       return super.onOptionsItemSelected(item);
    }
 
-   public void alert(){
-
-      AlertDialog.Builder alert = new AlertDialog.Builder(this);
-      alert.setTitle("NOPE NO ZIP CODE!");
-      alert.setMessage("Enter zip Code");
-      alert.setNegativeButton("Close", new DialogInterface.OnClickListener(){
-         public void onClick(DialogInterface dialog, int whichButton){
-
-         }
-      });
-
-      alert.show();
-
-   }
-
-   public void networkAlert(){
-
-      AlertDialog.Builder alert = new AlertDialog.Builder(this);
-      alert.setTitle("No Internet!");
-      alert.setMessage("No internet....");
-      alert.setNegativeButton("Close", new DialogInterface.OnClickListener(){
-         public void onClick(DialogInterface dialog, int whichButton){
-
-         }
-      });
-
-      alert.show();
-
-   }
-
-   public void nodataAlert(){
-
-      AlertDialog.Builder alert = new AlertDialog.Builder(this);
-      alert.setTitle("No Saved Data!");
-      alert.setMessage("No Saved Data....");
-      alert.setNegativeButton("Close", new DialogInterface.OnClickListener(){
-         public void onClick(DialogInterface dialog, int whichButton){
-
-         }
-      });
-
-      alert.show();
-
-   }
 }

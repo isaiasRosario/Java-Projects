@@ -14,6 +14,7 @@ import com.fullsail.fundamentalspart1.R;
  */
 public class FragmentTwo extends Fragment {
 
+   //setting arguments for fragment listener
    public static FragmentTwo instancof (String data, String data1, String data2, String data3){
       FragmentTwo frag = new FragmentTwo();
 
@@ -34,6 +35,7 @@ public class FragmentTwo extends Fragment {
 
       super.onCreateView(inflater, container, savedInstanceState);
 
+      //Set frag layout
       return inflater.inflate(R.layout.frag_two, container, false);
    }
 
@@ -41,12 +43,14 @@ public class FragmentTwo extends Fragment {
    public void onActivityCreated(Bundle savedInstanceState){
       super.onActivityCreated(savedInstanceState);
 
+      //Set text values passed from list view click
       Bundle args = getArguments();
       TextView tv = (TextView) getActivity().findViewById(R.id.textView);
       TextView tv2 = (TextView) getActivity().findViewById(R.id.textView2);
       TextView tv3 = (TextView) getActivity().findViewById(R.id.textView3);
       TextView tv4 = (TextView) getActivity().findViewById(R.id.textView4);
 
+      //Check if values are empty
       if (args !=null && args.containsKey("Data1")){
          tv.setText(args.getString("Data1"));
          tv2.setText(args.getString("Data"));
