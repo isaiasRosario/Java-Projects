@@ -239,8 +239,8 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
                      zipCode = zip;
                      url = "https://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20weather.bylocation%20WHERE%20location%3D%22" + zipCode + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 
-//                     new MyTask().execute(url);
-                     new MyAsyncTask().execute(url);
+                     new MyTask().execute(url);
+//                     new MyAsyncTask().execute(url);
                      //listener.clickListener(condition, zipLocation);
 
                   } else {
@@ -411,6 +411,8 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
             android.R.layout.simple_list_item_1, arr);
 
          lv.setAdapter(adapter);
+
+
 
 
          // Saving Data
