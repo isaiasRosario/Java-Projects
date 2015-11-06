@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Fundametals Part1</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="button">Get 5 Day Forecast</string>
+    <string name="text">Large Text</string>
+    <string name="zip_code">Zip Code</string>
+    <string name="text2">Large Text</string>
+    <string name="text3">Large Text</string>
+    <string name="text4">Large Text</string>
+</resources>
