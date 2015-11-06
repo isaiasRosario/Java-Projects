@@ -3,6 +3,7 @@ package com.fullsail.fundamentalspart1.libs;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,12 +16,25 @@ import android.widget.ListView;
 
 import com.fullsail.fundamentalspart1.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 
@@ -225,8 +239,8 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
                      zipCode = zip;
                      url = "https://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20weather.bylocation%20WHERE%20location%3D%22" + zipCode + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 
-                     new MyTask().execute(url);
-//                     new MyAsyncTask().execute(url);
+//                     new MyTask().execute(url);
+                     new MyAsyncTask().execute(url);
                      //listener.clickListener(condition, zipLocation);
 
                   } else {
@@ -314,115 +328,115 @@ public class FragmentOne extends Fragment implements AdapterView.OnItemClickList
 
 
    //Run Async Task
-//   private class MyAsyncTask extends AsyncTask<String, Void, Void> {
-//
-//      @Override
-//      protected void onPreExecute() {
-//
-//
-//      }
-//
-//      @Override
-//      protected Void doInBackground(String... params) {
-//
-//
-//         try {
-//            HttpClient client = new DefaultHttpClient();
-//            HttpPost post = new HttpPost(params[0]);
-//            HttpResponse response = client.execute(post);
-//
-//            int status = response.getStatusLine().getStatusCode();
-//            if (status == 200) {
-//
-//               HttpEntity entity = response.getEntity();
-//               String data = EntityUtils.toString(entity);
-//
-//               JSONObject obj1 = new JSONObject(data);
-//               JSONObject obj2 = obj1.getJSONObject("query").getJSONObject("results");
-//               JSONObject obj3 = obj2.getJSONObject("weather").getJSONObject("rss");
-//               JSONObject obj4 = obj3.getJSONObject("channel").getJSONObject("item");
-//
-//               JSONObject location = obj3.getJSONObject("channel").getJSONObject("location");
-//               String city = location.getString("city");
-//               String state = location.getString("region");
-//               String country = location.getString("country");
-//               zipLocation = city + ", " + state + " " + country;
-//
-//               JSONArray arrObj = obj4.getJSONArray("forecast");
-//               System.out.println(arrObj);
-//
-//               listener.clickListener(null, zipLocation, null, null);
-//
-//               arr.clear();
-//               arr2.clear();
-//               arr3.clear();
-//               arr4.clear();
-//
-//               for (int i = 0; i < arrObj.length(); i++) {
-//
-//                  JSONObject forecast = arrObj.getJSONObject(i);
-//
-//                  arr.add(forecast.getString("date"));
-//                  arr2.add(forecast.getString("text"));
-//                  arr3.add(forecast.getString("high"));
-//                  arr4.add(forecast.getString("low"));
-//
-//                  System.out.println("Condition: " + forecast.getString("text"));
-//                  System.out.println("High: " + forecast.getString("high"));
-//                  System.out.println("Low: " + forecast.getString("low"));
-//                  System.out.println("Day: " + forecast.getString("day"));
-//                  System.out.println("Date: " + forecast.getString("date"));
-//               }
-//
-//            }
-//         } catch (ClientProtocolException e) {
-//            e.printStackTrace();
-//         } catch (IOException e) {
-//            e.printStackTrace();
-//         } catch (JSONException e) {
-//            e.printStackTrace();
-//         }
-//         return null;
-//      }
-//
-//
-//      //After async task is done populate list view
-//      @Override
-//      protected void onPostExecute(Void results) {
-//         super.onPostExecute(results);
-//         System.out.println(results);
-//         System.out.println(arr);
-//
-//         adapter = new ArrayAdapter<String>(getActivity(),
-//            android.R.layout.simple_list_item_1, arr);
-//
-//         lv.setAdapter(adapter);
-//
-//
-//         // Saving Data
-//         try {
-//            arraylist.add(0, arr);
-//            arraylist.add(1, arr2);
-//            arraylist.add(2, arr3);
-//            arraylist.add(3, arr4);
-//
-//            FileOutputStream fos = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), "myfile"));
-//            ObjectOutputStream oos = new ObjectOutputStream(fos);
-//            oos.writeObject(arraylist);
-//            oos.close();
-//            fos.close();
-//
-//            FileOutputStream fos2 = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), "myfile2"));
-//            fos2.write(zipLocation.getBytes());
-//            fos2.close();
-//
-//            System.out.println("FILE SAVED!");
-//         } catch (IOException ioe) {
-//            ioe.printStackTrace();
-//         }
-//
-//
-//      }
-//   }
+   private class MyAsyncTask extends AsyncTask<String, Void, Void> {
+
+      @Override
+      protected void onPreExecute() {
+
+
+      }
+
+      @Override
+      protected Void doInBackground(String... params) {
+
+
+         try {
+            HttpClient client = new DefaultHttpClient();
+            HttpPost post = new HttpPost(params[0]);
+            HttpResponse response = client.execute(post);
+
+            int status = response.getStatusLine().getStatusCode();
+            if (status == 200) {
+
+               HttpEntity entity = response.getEntity();
+               String data = EntityUtils.toString(entity);
+
+               JSONObject obj1 = new JSONObject(data);
+               JSONObject obj2 = obj1.getJSONObject("query").getJSONObject("results");
+               JSONObject obj3 = obj2.getJSONObject("weather").getJSONObject("rss");
+               JSONObject obj4 = obj3.getJSONObject("channel").getJSONObject("item");
+
+               JSONObject location = obj3.getJSONObject("channel").getJSONObject("location");
+               String city = location.getString("city");
+               String state = location.getString("region");
+               String country = location.getString("country");
+               zipLocation = city + ", " + state + " " + country;
+
+               JSONArray arrObj = obj4.getJSONArray("forecast");
+               System.out.println(arrObj);
+
+               listener.clickListener(null, zipLocation, null, null);
+
+               arr.clear();
+               arr2.clear();
+               arr3.clear();
+               arr4.clear();
+
+               for (int i = 0; i < arrObj.length(); i++) {
+
+                  JSONObject forecast = arrObj.getJSONObject(i);
+
+                  arr.add(forecast.getString("date"));
+                  arr2.add(forecast.getString("text"));
+                  arr3.add(forecast.getString("high"));
+                  arr4.add(forecast.getString("low"));
+
+                  System.out.println("Condition: " + forecast.getString("text"));
+                  System.out.println("High: " + forecast.getString("high"));
+                  System.out.println("Low: " + forecast.getString("low"));
+                  System.out.println("Day: " + forecast.getString("day"));
+                  System.out.println("Date: " + forecast.getString("date"));
+               }
+
+            }
+         } catch (ClientProtocolException e) {
+            e.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
+         } catch (JSONException e) {
+            e.printStackTrace();
+         }
+         return null;
+      }
+
+
+      //After async task is done populate list view
+      @Override
+      protected void onPostExecute(Void results) {
+         super.onPostExecute(results);
+         System.out.println(results);
+         System.out.println(arr);
+
+         adapter = new ArrayAdapter<String>(getActivity(),
+            android.R.layout.simple_list_item_1, arr);
+
+         lv.setAdapter(adapter);
+
+
+         // Saving Data
+         try {
+            arraylist.add(0, arr);
+            arraylist.add(1, arr2);
+            arraylist.add(2, arr3);
+            arraylist.add(3, arr4);
+
+            FileOutputStream fos = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), "myfile"));
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(arraylist);
+            oos.close();
+            fos.close();
+
+            FileOutputStream fos2 = new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory(), "myfile2"));
+            fos2.write(zipLocation.getBytes());
+            fos2.close();
+
+            System.out.println("FILE SAVED!");
+         } catch (IOException ioe) {
+            ioe.printStackTrace();
+         }
+
+
+      }
+   }
 
 }
