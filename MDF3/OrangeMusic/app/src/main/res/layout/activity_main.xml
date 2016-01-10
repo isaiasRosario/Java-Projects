@@ -25,11 +25,30 @@
     <include layout="@layout/content_main"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/play_pause_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
+        android:layout_gravity="center|bottom"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_media_play"
+        app:backgroundTint="@color/colorAccent"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/skip_next_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:layout_marginEnd="32dp"
+        android:src="@android:drawable/ic_media_next"
+        app:backgroundTint="@color/colorAccent"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/skip_back_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_margin="16dp"
+        android:layout_marginStart="32dp"
+        android:src="@android:drawable/ic_media_previous"
+        app:backgroundTint="@color/colorAccent"/>
 
 </android.support.design.widget.CoordinatorLayout>
