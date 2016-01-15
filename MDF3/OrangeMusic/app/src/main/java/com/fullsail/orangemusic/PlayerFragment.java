@@ -1,16 +1,12 @@
 package com.fullsail.orangemusic;
 
 import android.app.Fragment;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +17,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Created by isaiasrosario on 1/5/16.
@@ -34,6 +29,7 @@ public class PlayerFragment extends Fragment {
    ImageView overlay;
    FloatingActionButton play;
    String artStr;
+   View v;
 
    static boolean isPaused;
    boolean isResumed;
@@ -53,18 +49,40 @@ public class PlayerFragment extends Fragment {
    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       super.onCreateView(inflater, container, savedInstanceState);
 
-      // Set view
-      View v = inflater.inflate(R.layout.player_main, container, false);
+      v = inflater.inflate(R.layout.player_main, container, false);
 
       // Initiate text views and artwork image views and the seek bar
       tv = (TextView) v.findViewById(R.id.TextView);
-      tv.setSelected(true);
+      tv.setFocusable(false);
+
       art = (ImageView) v.findViewById(R.id.artWork);
       overlay = (ImageView) v.findViewById(R.id.overlay);
 
       duration = (TextView) v.findViewById(R.id.duration);
       position = (TextView) v.findViewById(R.id.position);
       seekBar = (SeekBar) v.findViewById(R.id.seekBar);
+
+
+      seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+         int progressChanged = 0;
+
+         @Override
+         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            progressChanged = progress;
+         }
+
+         @Override
+         public void onStartTrackingTouch(SeekBar seekBar) {
+            togglePlayPause();
+         }
+
+         @Override
+         public void onStopTrackingTouch(SeekBar seekBar) {
+            MusicService.seek = progressChanged;
+            togglePlayPause();
+         }
+      });
 
       // If first time opening app then create default track information for text and image
       if (savedInstanceState == null) {
@@ -73,7 +91,7 @@ public class PlayerFragment extends Fragment {
          artUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/drawable/glitch");
          uri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/raw/glitch");
 
-         tv.setText("               " + "Jason Shaw" + ":  " + "Glitch" + "               ");
+         tv.setText("         " + "Jason Shaw" + ":  " + "Glitch" + "                                               ");
 
          art.setImageURI(artUri);
       }
@@ -92,7 +110,13 @@ public class PlayerFragment extends Fragment {
       next.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            playNext();
+            if (MainActivity.isLoop){
+               playMusic();
+
+            }else {
+               playNext();
+            }
+
          }
       });
 
@@ -101,7 +125,13 @@ public class PlayerFragment extends Fragment {
       backButton.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            playBack();
+
+            if (MainActivity.isLoop){
+               playMusic();
+
+            }else {
+               playBack();
+            }
          }
       });
 
@@ -112,6 +142,10 @@ public class PlayerFragment extends Fragment {
    @Override
    public void onActivityCreated(Bundle savedInstanceState) {
       super.onActivityCreated(savedInstanceState);
+
+      getView();
+
+
 
       System.out.println("onAcivityPlayerFrag");
    }
@@ -139,7 +173,12 @@ public class PlayerFragment extends Fragment {
 
          mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
-               complete();
+               if (MainActivity.isLoop){
+                  playMusic();
+
+               }else {
+                  complete();
+               }
             }
 
          });
@@ -159,6 +198,8 @@ public class PlayerFragment extends Fragment {
 
       if (isResumed || mMediaPlayer.isPlaying()) {
          isResumed = false;
+         tv.setFocusable(false);
+         tv.setSelected(false);
 
          MainActivity.musicService.pausePlay();
          isPaused = true;
@@ -178,14 +219,20 @@ public class PlayerFragment extends Fragment {
          }
 
          if (MainActivity.isBound) {
-            seekBar.setMax(mMediaPlayer.getDuration());
             seekBar.setProgress(mMediaPlayer.getCurrentPosition());
             MainActivity.musicService.startPlay();
+            tv.setFocusable(true);
+            tv.setSelected(true);
 
 
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                public void onCompletion(MediaPlayer mp) {
-                  complete();
+                  if (MainActivity.isLoop){
+                     playMusic();
+
+                  }else {
+                     complete();
+                  }
                }
 
             });
@@ -197,107 +244,36 @@ public class PlayerFragment extends Fragment {
 
    // Play next track method and loops through playlist when it hits the last track
    void playNext() {
-      count++;
-      if (count < MusicService.songs.size()) {
-         next();
-         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            MusicService.seek = 0;
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-               mMediaPlayer.setDataSource(getActivity(), uri);
-               mMediaPlayer.prepare();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
+      tv.setFocusable(true);
+      tv.setSelected(true);
 
-            if (MainActivity.isBound) {
-               position.setText(MusicService.getTimeString(
-                  mMediaPlayer.getCurrentPosition()));
+         count++;
+         if (count < MusicService.songs.size()) {
+            next();
+            playMusic();
 
-               MainActivity.musicService.startPlay();
+         } else {
+            count = 0;
+            next();
+            playMusic();
 
-               play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
-            }
-         }
-
-      } else {
-         count = 0;
-         next();
-         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            MusicService.seek = 0;
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-               mMediaPlayer.setDataSource(getActivity(), uri);
-               mMediaPlayer.prepare();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-
-            if (MainActivity.isBound) {
-               position.setText(MusicService.getTimeString(
-                  mMediaPlayer.getCurrentPosition()));
-
-               MainActivity.musicService.startPlay();
-
-               play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
-            }
-         }
-
-      }// check for number of count
+         }// check for number of count
    }
 
    // Play previous track method and loops through playlist when it hits the last track
    void playBack() {
+      tv.setFocusable(true);
+      tv.setSelected(true);
       if (count == 0) {
          count = 4;
 
          back();
-         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            MusicService.seek = 0;
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-               mMediaPlayer.setDataSource(getActivity(), uri);
-               mMediaPlayer.prepare();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-
-            if (MainActivity.isBound) {
-               position.setText(MusicService.getTimeString(
-                  mMediaPlayer.getCurrentPosition()));
-
-               MainActivity.musicService.startPlay();
-
-               play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
-            }
-         }
+         playMusic();
 
       } else {
          count--;
          back();
-         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            MusicService.seek = 0;
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-               mMediaPlayer.setDataSource(getActivity(), uri);
-               mMediaPlayer.prepare();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-
-            if (MainActivity.isBound) {
-               position.setText(MusicService.getTimeString(
-                  mMediaPlayer.getCurrentPosition()));
-
-               MainActivity.musicService.startPlay();
-
-               play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
-            }
-         }
+         playMusic();
 
       }
    }
@@ -307,7 +283,7 @@ public class PlayerFragment extends Fragment {
 
       String artistStr = MusicService.songs.get(count).getArtist();
       String nameStr = MusicService.songs.get(count).getName();
-      tv.setText("               " + artistStr + ":  " + nameStr + "                         ");
+      tv.setText("         " + artistStr + ":  " + nameStr + "                                                  ");
 
       String uriStr = MusicService.songs.get(count).getUri();
       uri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/raw/" + uriStr);
@@ -321,7 +297,7 @@ public class PlayerFragment extends Fragment {
 
       String artistStr = MusicService.songs.get(count).getArtist();
       String nameStr = MusicService.songs.get(count).getName();
-      tv.setText("               " + artistStr + ":  " + nameStr + "                         ");
+      tv.setText("           " + artistStr + ":  " + nameStr + "                                               ");
 
       String uriStr = MusicService.songs.get(count).getUri();
       uri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/raw/" + uriStr);
@@ -336,28 +312,12 @@ public class PlayerFragment extends Fragment {
       if (count < MusicService.songs.size() - 1) {
          count++;
          next();
-         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            MusicService.seek = 0;
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-               mMediaPlayer.setDataSource(getActivity(), uri);
-               mMediaPlayer.prepare();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-
-            position.setText(MusicService.getTimeString(
-               mMediaPlayer.getCurrentPosition()));
-
-            MainActivity.musicService.startPlay();
-
-            play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
-
-         }
+         playMusic();
       } else {
          if (mMediaPlayer != null) {
             MainActivity.musicService.pausePlay();
+            tv.setSelected(false);
+            tv.setFocusable(false);
             art.clearAnimation();
             count = 0;
             next();
@@ -375,38 +335,31 @@ public class PlayerFragment extends Fragment {
 
             isPaused = true;
             play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_play));
-
          }
       }
    }
 
-   // ****************
-   // *******  Working on adding sound cloud api for the music data in the near future.
-   // ****************
-   //      new DownloadImageTask(art).execute("https://i1.sndcdn.com/artworks-000141748082-iluj2w-large.jpg");
-   //      mMediaPlayer.setDataSource("https://api.soundcloud.com/tracks/240241506/stream?client_id=f609f86b1f00788171c3e71a87ae38b8");
-   private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-      ImageView bmImage;
-
-      public DownloadImageTask(ImageView bmImage) {
-         this.bmImage = bmImage;
-      }
-
-      protected Bitmap doInBackground(String... urls) {
-         String urldisplay = urls[0];
-         Bitmap img = null;
+   void playMusic(){
+      if (mMediaPlayer != null) {
+         mMediaPlayer.reset();
+         MusicService.seek = 0;
+         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
          try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            img = BitmapFactory.decodeStream(in);
-         } catch (Exception e) {
-            Log.e("Error", e.getMessage());
+            mMediaPlayer.setDataSource(getActivity(), uri);
+            mMediaPlayer.prepare();
+         } catch (IOException e) {
             e.printStackTrace();
          }
-         return img;
+
+         if (MainActivity.isBound) {
+            position.setText(MusicService.getTimeString(
+               mMediaPlayer.getCurrentPosition()));
+
+            MainActivity.musicService.startPlay();
+
+            play.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.ic_media_pause));
+         }
       }
 
-      protected void onPostExecute(Bitmap result) {
-         bmImage.setImageBitmap(result);
-      }
    }
 }

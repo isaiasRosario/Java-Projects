@@ -19,6 +19,7 @@ import java.util.ArrayList;
 /**
  * Created by isaiasrosario on 1/7/16.
  */
+
 public class MusicService extends Service {
 
    // Variables
@@ -59,23 +60,17 @@ public class MusicService extends Service {
    // Play track method
    public void startPlay() {
 
+      PlayerFragment.seekBar.setMax(PlayerFragment.mMediaPlayer.getDuration());
       // If player is not playing then play music
       if (!PlayerFragment.mMediaPlayer.isPlaying()) {
          PlayerFragment.mMediaPlayer.start();
          PlayerFragment.mMediaPlayer.seekTo(seek);
 
 
-//******** Messing with animations trying to get it to pause ********//
-//******** the spin animation and resume from the current spot ********//
-
-//         anim = ObjectAnimator.ofFloat(PlayerFragment.art, "rotation", 0, 360);
-//         anim.setDuration(PlayerFragment.mMediaPlayer.getDuration());
-//         anim.setRepeatCount(Animation.INFINITE);
-//         anim.start();
-
          // Rotate the artwork 360 degrees based on track duratoin
          final Animation rotate = AnimationUtils.loadAnimation(this, R.anim.rotate);
          rotate.setDuration(PlayerFragment.mMediaPlayer.getDuration());
+         PlayerFragment.art.clearAnimation();
          PlayerFragment.art.startAnimation(rotate);
 
          // Call send notification method
@@ -117,6 +112,11 @@ public class MusicService extends Service {
       PlayerFragment.art.buildDrawingCache();
       Bitmap b = PlayerFragment.art.getDrawingCache();
       builder.setLargeIcon(b);
+      NotificationCompat.BigTextStyle bigStyle = new NotificationCompat.BigTextStyle();
+      bigStyle.bigText(songs.get(PlayerFragment.count).getArtist());
+      bigStyle.setBigContentTitle(songs.get(PlayerFragment.count).getName());
+      bigStyle.setSummaryText("Orange Slice Music");
+      builder.setStyle(bigStyle);
 
       Intent startIntent = new Intent(this, MainActivity.class);
       PendingIntent contentIntent = PendingIntent.getActivity(this, REQUEST_CODE, startIntent, 0);

@@ -5,10 +5,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+
+/**
+ * Created by isaiasrosario on 1/7/16.
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +25,32 @@ public class MainActivity extends AppCompatActivity {
    FragmentManager fragManager;
    static MusicService musicService;
    static boolean isBound;
+
+
+
+   // Check to see if repeat is on variable
+   public static boolean isLoop;
+
+   @Override
+   public void onConfigurationChanged(Configuration newConfig){
+      super.onConfigurationChanged(newConfig);
+
+//      if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+//         setContentView(R.layout.activity_main);
+//         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//         setSupportActionBar(toolbar);
+//         fragManager = getFragmentManager();
+//         fragManager.beginTransaction().replace(R.id.player_frame_layout, new PlayerFragment()).commit();
+//
+//      }else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+//         setContentView(R.layout.activity_main);
+//         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//         setSupportActionBar(toolbar);
+//         fragManager = getFragmentManager();
+//         fragManager.beginTransaction().replace(R.id.player_frame_layout, new PlayerFragment()).commit();
+//
+//      }
+   }
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -118,5 +153,46 @@ public class MainActivity extends AppCompatActivity {
       doUnbidingService();
       Intent intentStop = new Intent(this, MusicService.class);
       stopService(intentStop);
+   }
+
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+      // Inflate the menu; this adds items to the action bar if it is present.
+      getMenuInflater().inflate(R.menu.menu_main, menu);
+      Drawable newIcon = (Drawable)menu.getItem(0).getIcon();
+      if (!isLoop){
+         System.out.println("Repeat is off");
+         isLoop = false;
+         newIcon.mutate().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_IN);
+         menu.getItem(0).setIcon(newIcon);
+      }else {
+         System.out.println("Repeat is on");
+         isLoop = true;
+         newIcon.mutate().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
+         menu.getItem(0).setIcon(newIcon);
+      }
+      return true;
+   }
+
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+      int id = item.getItemId();
+      switch (id){
+         case R.id.action_loop:
+            Drawable newIcon = (Drawable)item.getIcon();
+            if (isLoop){
+               System.out.println("Repeat is off");
+               isLoop = false;
+               newIcon.mutate().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_IN);
+               item.setIcon(newIcon);
+            }else {
+               System.out.println("Repeat is on");
+               isLoop = true;
+               newIcon.mutate().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
+               item.setIcon(newIcon);
+            }
+      }
+
+      return super.onOptionsItemSelected(item);
    }
 }
