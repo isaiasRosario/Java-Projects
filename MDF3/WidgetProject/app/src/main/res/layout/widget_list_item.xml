@@ -1,0 +1,21 @@
+<LinearLayout android:id="@+id/widget_list_item"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:minHeight="48dp"
+              android:orientation="horizontal"
+              android:padding="8dp">
+
+    <TextView
+        android:id="@+id/makeTextViewWidget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primary_text"/>
+
+    <TextView
+        android:id="@+id/modelTextViewWidget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primary_text"/>
+
+</LinearLayout>
