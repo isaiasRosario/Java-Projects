@@ -1,0 +1,19 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=A1:F1:BC:2A:3F:48:4D:23:A3:1C:0B:94:0D:40:37:7A:A8:2F:3A:AA%3Bcom.fullsail.map
+
+    You can also add your credentials to an existing key, using this line:
+    A1:F1:BC:2A:3F:48:4D:23:A3:1C:0B:94:0D:40:37:7A:A8:2F:3A:AA;com.fullsail.map
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBKADpYpE4SI3nYqqcSXjHxyyvCBa56UYk</string>
+</resources>
